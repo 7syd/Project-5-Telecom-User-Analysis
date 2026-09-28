@@ -1,530 +1,458 @@
-\# Telecom User Analytics
+# 📡 Telecom User Analytics
 
+> **End-to-end customer analytics and machine learning pipeline for a telecommunications dataset.**
 
+This project analyzes telecom customer behavior across **engagement, network experience, and satisfaction**. It combines exploratory data analysis, customer segmentation, feature engineering, machine learning, MySQL, MLflow, FastAPI, Docker, unit testing, and CI/CD into a reusable analytics pipeline.
 
-A machine learning and analytics project for analyzing customer engagement, network experience, and satisfaction in the telecommunications industry.
+---
 
+## 📌 Project Overview
 
+The goal of this project is to understand how customers use a telecommunications network, evaluate their network experience, and derive an overall satisfaction score.
 
-\## Project Overview
+The analysis is divided into four major areas:
 
+| Area | Focus |
+|---|---|
+| 👤 **User Overview** | Handsets, manufacturers, usage patterns |
+| 📊 **User Engagement** | Sessions, duration, and traffic |
+| 📶 **User Experience** | TCP retransmission, RTT, and throughput |
+| ⭐ **User Satisfaction** | Combined engagement and experience analysis |
 
+The final dataset contains **148,506 records and 55 columns**, representing **106,856 unique customers** after preprocessing.
 
-This project analyzes telecom customer data to understand:
+---
 
-
-
-\- User engagement and activity
-
-\- Network experience and performance
-
-\- Customer satisfaction
-
-\- Customer segmentation
-
-\- Satisfaction prediction
-
-\- Model tracking and deployment
-
-
-
-The project follows a complete analytics-to-deployment workflow, including data preprocessing, exploratory data analysis, feature engineering, clustering, regression, MySQL integration, MLflow tracking, API deployment, Docker, reusable feature engineering, automated testing, and CI/CD.
-
-
-
-\## Objectives
-
-
-
-The project focuses on four major areas:
-
-
-
-1\. \*\*User Overview\*\*
-
-2\. \*\*User Engagement Analysis\*\*
-
-3\. \*\*User Experience Analysis\*\*
-
-4\. \*\*User Satisfaction Analysis\*\*
-
-
-
-\---
-
-
-
-\## Dataset
-
-
-
-The telecom dataset contains customer session-level information including:
-
-
-
-\- Customer identifiers
-
-\- Session duration
-
-\- Download and upload traffic
-
-\- TCP retransmission
-
-\- RTT
-
-\- Throughput
-
-\- Handset manufacturer
-
-\- Handset type
-
-\- Application traffic
-
-
-
-After data preparation and cleaning, the final dataset contained:
-
-
-
-\*\*148,506 records and 55 columns\*\*
-
-
-
-The customer-level feature store contains approximately:
-
-
-
-\*\*106,856 unique customers\*\*
-
-
-
-\---
-
-
-
-\## Project Workflow
-
-
+## 🔄 Project Workflow
 
 ```text
-
 Raw Telecom Data
-
-&#x20;      │
-
-&#x20;      ▼
-
-Data Cleaning \& Preparation
-
-&#x20;      │
-
-&#x20;      ▼
-
+       │
+       ▼
+Data Cleaning & Preparation
+       │
+       ▼
 Exploratory Data Analysis
-
-&#x20;      │
-
-&#x20;      ├───────────────┐
-
-&#x20;      ▼               ▼
-
-Engagement        Experience
-
-Analysis          Analysis
-
-&#x20;      │               │
-
-&#x20;      └───────┬───────┘
-
-&#x20;              ▼
-
-&#x20;       Customer Features
-
-&#x20;              │
-
-&#x20;              ▼
-
-&#x20;     Customer Satisfaction
-
-&#x20;              │
-
-&#x20;      ┌───────┴────────┐
-
-&#x20;      ▼                ▼
-
-&#x20;  Clustering       Regression
-
-&#x20;      │                │
-
-&#x20;      └───────┬────────┘
-
-&#x20;              ▼
-
-&#x20;       Model Tracking
-
-&#x20;           MLflow
-
-&#x20;              │
-
-&#x20;              ▼
-
-&#x20;         FastAPI API
-
-&#x20;              │
-
-&#x20;              ▼
-
-&#x20;           Docker
-
+       │
+       ├───────────────┐
+       ▼               ▼
+User Engagement    User Experience
+       │               │
+       ▼               ▼
+K-Means Clustering   K-Means Clustering
+       │               │
+       └───────┬───────┘
+               ▼
+       Satisfaction Scoring
+               │
+               ▼
+      Regression Modeling
+               │
+               ▼
+    Satisfaction Clustering
+               │
+        ┌──────┼──────┐
+        ▼      ▼      ▼
+      MySQL   MLflow  FastAPI
+                       │
+                       ▼
+                     Docker
 ```
 
+---
 
+## 👤 User Overview
 
-\## User Overview
+The user overview analysis examined:
 
+- Top 10 handset types
+- Top 3 handset manufacturers
+- Top 5 handsets for each major manufacturer
+- Customer-level usage statistics
+- Missing values and outliers
+- Univariate and bivariate relationships
+- Application traffic compared with total traffic
+- Traffic distribution using deciles
 
+### 📱 Most Represented Manufacturers
 
-The user overview analysis included:
+The three most represented manufacturers were:
 
+- **Apple**
+- **Samsung**
+- **Huawei**
 
+The analysis also identified the most frequently used handset models for each manufacturer.
 
-\- Top handset manufacturers
+---
 
-\- Most-used handsets
-
-\- Top handsets for major manufacturers
-
-\- Missing-value analysis
-
-\- Outlier analysis
-
-\- Univariate analysis
-
-\- Bivariate analysis
-
-\- Correlation analysis
-
-
-
-The three most represented handset manufacturers were:
-
-
-
-\- Apple
-
-\- Samsung
-
-\- Huawei
-
-
-
-Huawei B528S-23A was particularly prominent in the dataset and represents a network/router-type device rather than a conventional smartphone.
-
-
-
-\---
-
-
-
-\## User Engagement Analysis
-
-
+## 📊 User Engagement Analytics
 
 Customer-level engagement features were created using:
 
+- Number of sessions
+- Total session duration
+- Total download traffic
+- Total upload traffic
+- Total traffic
 
+### Engagement Segmentation
 
-\- Number of sessions
+K-Means clustering with **K = 3** was used to segment customers into engagement groups.
 
-\- Total session duration
+| Segment | Customers | Description |
+|---|---:|---|
+| 🟢 Low Engagement | 81,163 | Lower sessions, duration and traffic |
+| 🟡 Medium Engagement | 21,645 | Moderate usage |
+| 🔵 High Engagement | 4,048 | Higher sessions, duration and traffic |
 
-\- Total download traffic
+The clustering showed that the majority of customers belonged to the low-engagement segment, while a smaller group demonstrated substantially higher usage.
 
-\- Total upload traffic
+---
 
-\- Total traffic
+## 📶 User Experience Analytics
 
+Network experience was evaluated using:
 
+### TCP Retransmission
+- TCP DL retransmission
+- TCP UL retransmission
 
-K-Means clustering with \*\*3 clusters\*\* was used to segment customers into:
+### RTT
+- Average RTT DL
+- Average RTT UL
 
+### Throughput
+- Average throughput DL
+- Average throughput UL
 
+Missing values and extreme observations were handled before customer-level experience scoring and clustering.
 
-\- Low Engagement
+### Experience Segmentation
 
-\- Medium Engagement
+K-Means clustering with **K = 3** was applied to the six experience metrics.
 
-\- High Engagement
+The resulting groups represented relatively different network experience profiles based on:
 
+- Retransmission
+- Latency
+- Download throughput
+- Upload throughput
 
+Handset-level analysis was also performed to examine differences in throughput and retransmission across devices.
 
-The resulting customer distribution was approximately:
+---
 
+## ⭐ Customer Satisfaction
 
+Customer satisfaction was derived by combining engagement and experience.
 
-| Segment | Users | Percentage |
+### Engagement Score
 
-|---|---:|---:|
+The engagement score was calculated as the Euclidean distance between each customer's normalized engagement profile and the **less-engaged cluster center**.
 
-| Low Engagement | 81,163 | 75.9% |
+### Experience Score
 
-| Medium Engagement | 21,645 | 20.3% |
+The experience score was calculated as the Euclidean distance between each customer's normalized experience profile and the **worst-experience cluster center**.
 
-| High Engagement | 4,048 | 3.8% |
-
-
-
-\---
-
-
-
-\## User Experience Analysis
-
-
-
-Experience was analyzed using:
-
-
-
-\- TCP downlink retransmission
-
-\- TCP uplink retransmission
-
-\- Downlink RTT
-
-\- Uplink RTT
-
-\- Downlink throughput
-
-\- Uplink throughput
-
-
-
-The metrics showed strong skewness and extreme values, particularly for TCP retransmission and RTT.
-
-
-
-K-Means clustering with \*\*3 clusters\*\* was used to identify customer experience segments.
-
-
-
-The clusters were interpreted as:
-
-
-
-\- Low Experience
-
-\- Medium Experience
-
-\- High Experience
-
-
-
-The high-experience cluster showed stronger throughput performance across both download and upload metrics.
-
-
-
-\---
-
-
-
-\## Customer Satisfaction
-
-
-
-Customer satisfaction was calculated from two components:
-
-
-
-\### Engagement Score
-
-
-
-The engagement score represents the Euclidean distance between each customer's engagement feature vector and the less-engaged cluster center.
-
-
-
-\### Experience Score
-
-
-
-The experience score represents the Euclidean distance between each customer's experience feature vector and the worst-experience cluster center.
-
-
+### Satisfaction Score
 
 The final satisfaction score was calculated as:
 
-
-
 ```text
-
-Satisfaction Score =
-
-(Engagement Score + Experience Score) / 2
-
+Satisfaction Score
+    = (Engagement Score + Experience Score) / 2
 ```
 
+The resulting scores were used for further modeling and customer segmentation.
 
+---
 
-The resulting satisfaction dataset contained:
+## 🤖 Satisfaction Prediction
 
+A Linear Regression model was trained using the engagement and experience features.
 
-
-\*\*106,856 customers\*\*
-
-
-
-\---
-
-
-
-\## Satisfaction Prediction
-
-
-
-A Linear Regression model was trained to predict the satisfaction score using nine engineered features:
-
-
-
-\- Sessions Score
-
-\- Duration Score
-
-\- Traffic Score
-
-\- TCP DL Score
-
-\- TCP UL Score
-
-\- RTT DL Score
-
-\- RTT UL Score
-
-\- Throughput DL Score
-
-\- Throughput UL Score
-
-
-
-\### Model Performance
-
-
+### Model Performance
 
 | Metric | Result |
-
 |---|---:|
+| RMSE | **0.0351** |
+| R² | **0.8194** |
 
-| RMSE | 0.0351 |
+The model was trained using an **80/20 train-test split** with `random_state=42`.
 
-| R² | 0.8194 |
+> Note: The satisfaction score is derived from the underlying engagement and experience scores, so the regression task is primarily a demonstration of the modeling pipeline rather than an independent real-world target.
 
+---
 
+## 🧩 Satisfaction Segmentation
 
-The model achieved an R² of approximately \*\*0.819\*\*, meaning it explained about 81.9% of the variation in the test-set satisfaction scores.
+A second K-Means model with **K = 2** was applied using engagement and experience scores.
 
+| Cluster | Customers | Avg. Satisfaction | Avg. Experience | Avg. Engagement |
+|---|---:|---:|---:|---:|
+| Cluster 0 | 86,022 | 0.4857 | 0.9257 | 0.0456 |
+| Cluster 1 | 20,834 | 0.3322 | 0.5908 | 0.0736 |
 
+This provides a final customer segmentation based on the combined engagement and experience dimensions.
 
-\---
+---
 
+## 🗄️ MySQL Integration
 
+The final customer-level scores were exported to a local MySQL database.
 
-\## Satisfaction Clustering
-
-
-
-A second K-Means model with \*\*2 clusters\*\* was applied to the engagement and experience scores.
-
-
-
-The resulting groups showed different combinations of engagement and experience characteristics.
-
-
-
-The larger cluster had:
-
-
-
-\- Average satisfaction: \*\*0.4857\*\*
-
-\- Average experience: \*\*0.9257\*\*
-
-\- Average engagement: \*\*0.0456\*\*
-
-
-
-The smaller cluster had:
-
-
-
-\- Average satisfaction: \*\*0.3322\*\*
-
-\- Average experience: \*\*0.5908\*\*
-
-\- Average engagement: \*\*0.0736\*\*
-
-
-
-\---
-
-
-
-\## MySQL Integration
-
-
-
-The final customer scores were exported to a local MySQL database.
-
-
-
-Database:
-
-
+### Database
 
 ```text
-
-telecom\_analysis
-
+Database: telecom_analysis
+Table: customer_scores
 ```
 
-
-
-Table:
-
-
+### Stored fields
 
 ```text
-
-customer\_scores
-
+MSISDN_Number
+Engagement_Score
+Experience_Score
+Satisfaction_Score
 ```
 
+A total of **106,856 customer records** were inserted and validated using SQL queries.
 
+---
 
-The table contains:
+## 📈 MLflow Experiment Tracking
 
+MLflow was used to track the satisfaction regression experiment.
 
+Tracked information includes:
 
-\- Customer ID
+- Model parameters
+- RMSE
+- R²
+- Trained regression model
 
-\- Engagement Score
+The trained model was saved as:
 
-\- Experience Score
+```text
+models/satisfaction_regression_model.pkl
+```
 
-\- Satisfaction Score
+---
 
+## 🚀 FastAPI Deployment
 
+A FastAPI application was created to expose the trained model through an API.
 
-A SQL query was used to verify the stored customer records.
+### Endpoints
 
+```text
+GET /
+```
 
+Health/status endpoint.
 
-\---
+```text
+POST /predict
+```
 
+Accepts customer feature values and returns a predicted satisfaction score.
 
+Example response:
 
-\## MLflow
+```json
+{
+  "predicted_satisfaction_score": 1.0887824951614828
+}
+```
 
+---
 
+## 🐳 Docker
 
-ML
+The FastAPI application was containerized using Docker.
 
+The Docker image:
+
+```text
+telecom-satisfaction-api:latest
+```
+
+The container exposes the API on:
+
+```text
+http://localhost:8000
+```
+
+The Dockerized API was tested successfully using the `/predict` endpoint.
+
+---
+
+## 🧪 Testing
+
+Unit tests were created for the reusable feature-engineering functions.
+
+The test suite covers:
+
+- Engagement feature generation
+- Experience feature generation
+- Combined feature store generation
+
+Current result:
+
+```text
+3 tests passed
+```
+
+Run the tests with:
+
+```bash
+python -m pytest
+```
+
+---
+
+## ⚙️ CI/CD
+
+GitHub Actions is configured to automatically run the test suite on:
+
+- Push
+- Pull request
+
+Workflow:
+
+```text
+.github/workflows/tests.yml
+```
+
+The workflow:
+
+1. Checks out the repository
+2. Sets up Python 3.11
+3. Installs dependencies
+4. Runs the pytest suite
+
+---
+
+## 🧱 Reusable Feature Engineering
+
+Reusable feature-engineering functions are located in:
+
+```text
+src/features.py
+```
+
+The module provides:
+
+```python
+build_engagement_features()
+build_experience_features()
+build_feature_store()
+```
+
+The resulting customer-level feature store is saved at:
+
+```text
+feature_store/customer_features.csv
+```
+
+---
+
+## 📁 Project Structure
+
+```text
+telecom-user-analytics/
+│
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+│
+├── app/
+│   └── app.py
+│
+├── feature_store/
+│   └── customer_features.csv
+│
+├── models/
+│   └── satisfaction_regression_model.pkl
+│
+├── notebooks/
+│   └── telecom_analysis.ipynb
+│
+├── src/
+│   └── features.py
+│
+├── tests/
+│   └── test_features.py
+│
+├── .gitignore
+├── Dockerfile
+├── README.md
+└── requirements.txt
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Data & Analysis
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Seaborn
+- Scikit-learn
+
+### Machine Learning
+- K-Means Clustering
+- Linear Regression
+- Feature Scaling
+- Euclidean Distance
+
+### Database
+- MySQL
+- MySQL Connector/Python
+
+### MLOps & Deployment
+- MLflow
+- FastAPI
+- Docker
+
+### Testing & CI/CD
+- Pytest
+- GitHub Actions
+
+---
+
+## 📌 Key Deliverables
+
+- ✅ Telecom data preprocessing
+- ✅ Exploratory data analysis
+- ✅ Customer engagement analysis
+- ✅ Customer experience analysis
+- ✅ Engagement clustering
+- ✅ Experience clustering
+- ✅ Customer satisfaction scoring
+- ✅ Satisfaction prediction model
+- ✅ Satisfaction clustering
+- ✅ MySQL integration
+- ✅ MLflow experiment tracking
+- ✅ Reusable feature-engineering module
+- ✅ Feature store
+- ✅ FastAPI prediction API
+- ✅ Docker deployment
+- ✅ Unit tests
+- ✅ GitHub Actions CI/CD
+
+---
+
+## 👨‍💻 Author
+
+**Siddheya**
+
+B.E. Artificial Intelligence & Data Science
+
+---
+
+> **Built as an end-to-end data analytics and machine learning project covering the complete path from raw telecom data to a deployed prediction API.**
